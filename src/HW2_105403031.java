@@ -31,6 +31,8 @@ public class HW2_105403031 extends JFrame{
     private JPanel brush_size_big_holder;
     private JPanel fill_panel;
     private JPanel menu_holder;
+    private String current_mode = "筆刷";
+    private String size_selected = "small"; //記錄用戶選了那一個size 的筆刷, 預設是small
 
     public HW2_105403031() {
         super("小畫家");
@@ -76,7 +78,7 @@ public class HW2_105403031 extends JFrame{
         brush_size_medium_holder.setLayout(new GridLayout(2, 1));
         brush_size_big_holder.setLayout(new GridLayout(2, 1));
 
-        small_size = new JRadioButton("小", false);
+        small_size = new JRadioButton("小", true);
         medium_size = new JRadioButton("中", false);
         big_size = new JRadioButton("大", false);
         //
@@ -154,13 +156,46 @@ public class HW2_105403031 extends JFrame{
 
     public class DrawingPanel extends JPanel{
         // 用ArrayList記錄 所有繪圖的點
-        private ArrayList<Point> points = new ArrayList<>();
+        private ArrayList<Point> points_small_size = new ArrayList<>();
+        private ArrayList<Point> points_medium_size = new ArrayList<>();
+        private ArrayList<Point> points_big_size = new ArrayList<>();
 
         public DrawingPanel(){
             addMouseMotionListener(new MouseMotionListener() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    points.add(e.getPoint());
+
+                    //判斷下拉選單選擇了那個繪圖工具
+                    if (current_mode.matches("筆刷")){
+
+                        // 大 中 小size 筆刷的繪畫記錄(遊標位置) 會記錄在對應的arrayList
+                        if (size_selected.matches("small")) {
+
+                            points_small_size.add(e.getPoint());
+
+                        }else if (size_selected.matches("medium")){
+
+                            points_medium_size.add(e.getPoint());
+
+                        }else {
+
+                            points_big_size.add(e.getPoint());
+
+                        }
+                        //
+
+                    }else if(current_mode.matches("直線")){
+
+                    }else if (current_mode.matches("橢圓形")){
+
+                    }else if (current_mode.matches("矩形")){
+
+                    }else {
+
+                    }
+                    //
+
+                    //每畫完一個點 更新JPanel
                     repaint();
                 }
 
@@ -176,9 +211,16 @@ public class HW2_105403031 extends JFrame{
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            // draw all
-            for (Point point : points)
-                g.fillOval(point.x, point.y, 4, 4);
+            // 記錄在arrayList 的遊標位置，用for loop 方法畫出來
+            for (Point point : points_small_size)
+                g.fillOval(point.x, point.y, 4, 4); //小size 筆刷的width, height 各為4
+
+            for (Point point : points_medium_size)
+                g.fillOval(point.x, point.y, 6, 6); //中size 筆刷的width, height 各為6
+
+            for (Point point : points_big_size)
+                g.fillOval(point.x, point.y, 8, 8); //大size 筆刷的width, height 各為8
+            //
         }
     }
 
@@ -215,8 +257,10 @@ public class HW2_105403031 extends JFrame{
         JComboBox_drawingTools.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                System.out.println("選擇 " + JComboBox_drawingTools.getSelectedItem().toString());
+                //String selected_item = JComboBox_drawingTools.getSelectedItem().toString();
+                current_mode = JComboBox_drawingTools.getSelectedItem().toString();
+
+                System.out.println("選擇 " + current_mode);
             }
         });
     }
@@ -227,6 +271,9 @@ public class HW2_105403031 extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (small_size.isSelected()){
                     System.out.println("選擇 小 筆刷");
+
+                    //記錄用戶選了那一個size 的筆刷
+                    size_selected = "small";
                 }
             }
         });
@@ -236,6 +283,8 @@ public class HW2_105403031 extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (medium_size.isSelected()){
                     System.out.println("選擇 中 筆刷");
+
+                    size_selected = "medium";
                 }
             }
         });
@@ -245,6 +294,8 @@ public class HW2_105403031 extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (big_size.isSelected()){
                     System.out.println("選擇 大 筆刷");
+
+                    size_selected = "big";
                 }
             }
         });
