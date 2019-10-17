@@ -110,6 +110,7 @@ public class HW2_105403031 extends JFrame{
         fill_panel.add(new JLabel("填滿"));
         fill_checkBox = new JCheckBox();
         fill_panel.add(fill_checkBox);
+        fill_checkBox.setEnabled(false); // 程式一打開時會是"筆刷" 模式， "筆刷"模式不開放填滿功能
         fill_checkBox_OnClick(); //當checkbox 勾選時，會印出 有勾選 / 沒有勾選
         //
 
@@ -241,7 +242,7 @@ public class HW2_105403031 extends JFrame{
     }
 
     private void fill_checkBox_OnClick(){
-        fill_checkBox.addItemListener(new ItemListener() {
+      fill_checkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (fill_checkBox.isSelected()){
@@ -257,8 +258,15 @@ public class HW2_105403031 extends JFrame{
         JComboBox_drawingTools.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //String selected_item = JComboBox_drawingTools.getSelectedItem().toString();
                 current_mode = JComboBox_drawingTools.getSelectedItem().toString();
+
+                //筆刷 情況下不能勾選 填滿
+                if (current_mode.matches("筆刷")){ //如果 現在是筆刷mode
+                    fill_checkBox.setEnabled(false); //填滿checkbox 不開放勾選
+                    fill_checkBox.setSelected(false);//checkbox切換回unchecked 的情況
+                }else {
+                    fill_checkBox.setEnabled(true); //填滿checkbox 開放勾選
+                }
 
                 System.out.println("選擇 " + current_mode);
             }
