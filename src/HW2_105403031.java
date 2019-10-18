@@ -1,5 +1,8 @@
+import javafx.scene.shape.Line;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.awt.Point;
 
@@ -33,6 +36,11 @@ public class HW2_105403031 extends JFrame{
     private JPanel menu_holder;
     private String current_mode = "筆刷";
     private String size_selected = "small"; //記錄用戶選了那一個size 的筆刷, 預設是small
+    private int start_point_x;
+    private int start_point_y;
+    private int end_point_x;
+    private int end_point_y;
+    private boolean fill_checked = false;
 
     public HW2_105403031() {
         super("小畫家");
@@ -160,6 +168,8 @@ public class HW2_105403031 extends JFrame{
         private ArrayList<Point> points_small_size = new ArrayList<>();
         private ArrayList<Point> points_medium_size = new ArrayList<>();
         private ArrayList<Point> points_big_size = new ArrayList<>();
+        private ArrayList<Line> lines = new ArrayList<>();
+        private ArrayList<Line> dotted_lines = new ArrayList<>();
 
         public DrawingPanel(){
             addMouseMotionListener(new MouseMotionListener() {
@@ -205,6 +215,80 @@ public class HW2_105403031 extends JFrame{
 
                 }
             });
+
+            addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+                    //判斷下拉選單選擇了那個繪圖工具
+                    if(current_mode.matches("直線")){
+
+                        //當用戶按下左鍵時 記錄點擊的位置
+                        start_point_x = e.getX();
+                        start_point_y = e.getY();
+                        //
+
+                    }else if (current_mode.matches("橢圓形")){
+
+                    }else if (current_mode.matches("矩形")){
+
+                    }else {
+
+                    }
+                    //
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+
+                    //判斷下拉選單選擇了那個繪圖工具
+                    if(current_mode.matches("直線")){
+
+                        //用戶放開左鍵時的位置
+                        end_point_x = e.getX();
+                        end_point_y = e.getY();
+                        //
+
+                        if (fill_checked){
+
+                            //記錄從那個點開始畫直線 到完結點
+                            lines.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                            //
+
+                        }else {
+
+                            dotted_lines.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+
+                        }
+
+                    }else if (current_mode.matches("橢圓形")){
+
+                    }else if (current_mode.matches("矩形")){
+
+                    }else {
+
+                    }
+                    //
+
+                    //更新JPanel
+                    repaint();
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
         }
 
         //draw ovals in a 4-by-4 bounding box at specified locations on window
@@ -221,6 +305,25 @@ public class HW2_105403031 extends JFrame{
 
             for (Point point : points_big_size)
                 g.fillOval(point.x, point.y, 8, 8); //大size 筆刷的width, height 各為8
+
+            for (Line line : lines) {
+                g.setColor(Color.BLACK);
+                g.drawLine((int)line.getStartX(), (int)line.getStartY(), (int)line.getEndX(), (int)line.getEndY());
+            }
+
+            for (Line dotted_line : dotted_lines) {
+                //creates a copy of the Graphics instance
+                Graphics2D g1 = (Graphics2D) g.create();
+
+                g1.setColor(Color.BLACK);
+                //set the stroke of the copy, not the original
+                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+                g1.setStroke(dashed);
+                g1.drawLine((int)dotted_line.getStartX(), (int)dotted_line.getStartY(), (int)dotted_line.getEndX(), (int)dotted_line.getEndY());
+
+                //gets rid of the copy
+                g1.dispose();
+            }
             //
         }
     }
@@ -247,8 +350,12 @@ public class HW2_105403031 extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (fill_checkBox.isSelected()){
                     System.out.println("選擇 填滿");
+
+                    fill_checked = true;
                 }else {
                     System.out.println("取消 填滿");
+
+                    fill_checked = false;
                 }
             }
         });
