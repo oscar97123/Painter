@@ -42,6 +42,7 @@ public class HW2_105403031 extends JFrame{
     private boolean fill_checked = false;
     private Point start_point;
     private Point end_point;
+    private Color chosen_color;
 
     public HW2_105403031() {
         super("小畫家");
@@ -243,31 +244,6 @@ public class HW2_105403031 extends JFrame{
 
 //                    start_point = e.getPoint();
                     //
-
-                    //判斷下拉選單選擇了那個繪圖工具
-                    if(current_mode.matches("直線")){
-
-
-                    }else if (current_mode.matches("橢圓形")){
-
-                        if (fill_checked){
-
-                        }else {
-
-                        }
-
-                    }else if (current_mode.matches("矩形")){
-
-                        if (fill_checked){
-
-                        }else {
-
-                        }
-
-                    }else {
-
-                    }
-                    //
                 }
 
                 @Override
@@ -297,12 +273,12 @@ public class HW2_105403031 extends JFrame{
 
                     }else if (current_mode.matches("橢圓形")){
 
-                        if (fill_checked){
+                        //計算兩點距離 並取 絕對值(防止出現負數)
+                        circle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                        circle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                        //
 
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            circle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                            circle_distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
+                        if (fill_checked){
 
                             //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
                             //再打包成一個"Point" 再記錄在arrayList 中
@@ -310,11 +286,6 @@ public class HW2_105403031 extends JFrame{
                             //
 
                         }else {
-
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            circle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                            circle_distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
 
                             //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
                             //再打包成一個"Point" 再記錄在arrayList 中
@@ -324,21 +295,16 @@ public class HW2_105403031 extends JFrame{
 
                     }else if (current_mode.matches("矩形")){
 
-                        if (fill_checked){
+                        //計算兩點距離 並取 絕對值(防止出現負數)
+                        rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                        rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                        //
 
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                            rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
+                        if (fill_checked){
 
                             rectangles_Fill.add(new Point(Math.min(start_point_x, end_point_x),  Math.min(start_point_y, end_point_y)));
 
                         }else {
-
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                            rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
 
                             rectangles_noFill.add(new Point(Math.min(start_point_x, end_point_x),  Math.min(start_point_y, end_point_y)));
 
@@ -373,17 +339,23 @@ public class HW2_105403031 extends JFrame{
             super.paintComponent(g);
 
             // 記錄在arrayList 的遊標位置，用for loop 方法畫出來
-            for (Point point : points_small_size)
+            for (Point point : points_small_size) {
+                g.setColor(chosen_color);
                 g.fillOval(point.x, point.y, 4, 4); //小size 筆刷的width, height 各為4
+            }
 
-            for (Point point : points_medium_size)
+            for (Point point : points_medium_size) {
+                g.setColor(chosen_color);
                 g.fillOval(point.x, point.y, 6, 6); //中size 筆刷的width, height 各為6
+            }
 
-            for (Point point : points_big_size)
+            for (Point point : points_big_size) {
+                g.setColor(chosen_color);
                 g.fillOval(point.x, point.y, 8, 8); //大size 筆刷的width, height 各為8
+            }
 
             for (Line line : lines) {
-                g.setColor(Color.BLACK);
+                g.setColor(chosen_color);
                 g.drawLine((int)line.getStartX(), (int)line.getStartY(), (int)line.getEndX(), (int)line.getEndY());
             }
 
@@ -391,7 +363,7 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(Color.BLACK);
+                g1.setColor(chosen_color);
                 //set the stroke of the copy, not the original
                 Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
                 g1.setStroke(dashed);
@@ -402,28 +374,28 @@ public class HW2_105403031 extends JFrame{
             }
 
             for (Point circle_noFIll : circles_noFill) {
-                g.setColor(Color.BLACK);
+                g.setColor(chosen_color);
                 if (i < circle_distance_x.size()) // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g.drawOval(circle_noFIll.x, circle_noFIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 i++;
             }
 
             for (Point circle_FIll : circles_Fill) {
-                g.setColor(Color.BLACK);
+                g.setColor(chosen_color);
                 if (i < circle_distance_x.size()) // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g.fillOval(circle_FIll.x, circle_FIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 i++;
             }
 
             for (Point rectangle_noFill : rectangles_noFill) {
-                g.setColor(Color.BLACK);
+                g.setColor(chosen_color);
                 if (j < rectangle_distance_x.size()) // 防止 out of bound error
                     g.drawRect(rectangle_noFill.x, rectangle_noFill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 j++;
             }
 
             for (Point rectangle_Fill : rectangles_Fill) {
-                g.setColor(Color.BLACK);
+                g.setColor(chosen_color);
                 if (j < rectangle_distance_x.size()) // 防止 out of bound error
                     g.fillRect(rectangle_Fill.x, rectangle_Fill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 j++;
@@ -437,6 +409,11 @@ public class HW2_105403031 extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("點選 筆刷顏色");
+
+                // 選好的顏色存在chosen_color
+                //title 設為"選擇顏色"
+                //預設顏色 黑色
+                chosen_color = JColorChooser.showDialog(drawingPanel, "選擇顏色", Color.BLACK);
             }
         });
 
