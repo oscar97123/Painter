@@ -1,4 +1,3 @@
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 import java.awt.*;
@@ -172,11 +171,17 @@ public class HW2_105403031 extends JFrame{
         private ArrayList<Point> points_big_size = new ArrayList<>();
         private ArrayList<Line> lines = new ArrayList<>();
         private ArrayList<Line> dotted_lines = new ArrayList<>();
-        private ArrayList<Point> circles_noFill = new ArrayList<Point>();
+        private ArrayList<Point> circles_noFill = new ArrayList<>();
         private ArrayList<Point> circles_Fill = new ArrayList<>();
-        private ArrayList<Integer> distance_x = new ArrayList<>();
-        private ArrayList<Integer> distance_y = new ArrayList<>();
+        private ArrayList<Integer> circle_distance_x = new ArrayList<>();
+        private ArrayList<Integer> circle_distance_y = new ArrayList<>();
+        private ArrayList<Point> rectangles_noFill = new ArrayList<>();
+        private ArrayList<Point> rectangles_Fill = new ArrayList<>();
+        private ArrayList<Integer> rectangle_distance_x = new ArrayList<>();
+        private ArrayList<Integer> rectangle_distance_y = new ArrayList<>();
+
         private int i = 0;
+        private int j = 0;
 
         public DrawingPanel(){
             addMouseMotionListener(new MouseMotionListener() {
@@ -275,11 +280,6 @@ public class HW2_105403031 extends JFrame{
 //                    end_point = e.getPoint();
                     //
 
-                    //計算兩點距離 並取 絕對值(防止出現負數)
-                    distance_x.add(Math.abs(start_point_x - end_point_x));
-                    distance_y.add(Math.abs(start_point_y - end_point_y));
-                    //
-
                     //判斷下拉選單選擇了那個繪圖工具
                     if(current_mode.matches("直線")){
 
@@ -298,13 +298,11 @@ public class HW2_105403031 extends JFrame{
                     }else if (current_mode.matches("橢圓形")){
 
                         if (fill_checked){
-/*
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            distance_x.add(Math.abs(start_point_x - end_point_x));
-                            distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
 
- */
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            circle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            circle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
 
                             //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
                             //再打包成一個"Point" 再記錄在arrayList 中
@@ -312,13 +310,11 @@ public class HW2_105403031 extends JFrame{
                             //
 
                         }else {
-/*
-                            //計算兩點距離 並取 絕對值(防止出現負數)
-                            distance_x.add(Math.abs(start_point_x - end_point_x));
-                            distance_y.add(Math.abs(start_point_y - end_point_y));
-                            //
 
- */
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            circle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            circle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
 
                             //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
                             //再打包成一個"Point" 再記錄在arrayList 中
@@ -330,7 +326,21 @@ public class HW2_105403031 extends JFrame{
 
                         if (fill_checked){
 
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
+
+                            rectangles_Fill.add(new Point(Math.min(start_point_x, end_point_x),  Math.min(start_point_y, end_point_y)));
+
                         }else {
+
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
+
+                            rectangles_noFill.add(new Point(Math.min(start_point_x, end_point_x),  Math.min(start_point_y, end_point_y)));
 
                         }
 
@@ -340,7 +350,8 @@ public class HW2_105403031 extends JFrame{
                     //
 
 
-                    i = 0; // reset i = 0  因為會out of bound (每次畫都會把之前的重畫，所以設成0)
+                    i = 0; // reset i = 0  因為會out of bound (每次畫都會把之前的重畫，所以設成0)  用於circle
+                    j = 0; // 用於rectangle
                     repaint(); //更新JPanel
                 }
 
@@ -392,16 +403,30 @@ public class HW2_105403031 extends JFrame{
 
             for (Point circle_noFIll : circles_noFill) {
                 g.setColor(Color.BLACK);
-                if (i < distance_x.size()) // 防止 out of bound error   (distance_x.size() & distance_y.size() 是一樣的，所以擇一檢查就好)
-                    g.drawOval(circle_noFIll.x, circle_noFIll.y, distance_x.get(i), distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
+                if (i < circle_distance_x.size()) // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
+                    g.drawOval(circle_noFIll.x, circle_noFIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 i++;
             }
 
             for (Point circle_FIll : circles_Fill) {
                 g.setColor(Color.BLACK);
-                if (i < distance_x.size()) // 防止 out of bound error   (distance_x.size() & distance_y.size() 是一樣的，所以擇一檢查就好)
-                    g.fillOval(circle_FIll.x, circle_FIll.y, distance_x.get(i), distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
+                if (i < circle_distance_x.size()) // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
+                    g.fillOval(circle_FIll.x, circle_FIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 i++;
+            }
+
+            for (Point rectangle_noFill : rectangles_noFill) {
+                g.setColor(Color.BLACK);
+                if (j < rectangle_distance_x.size()) // 防止 out of bound error
+                    g.drawRect(rectangle_noFill.x, rectangle_noFill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
+                j++;
+            }
+
+            for (Point rectangle_Fill : rectangles_Fill) {
+                g.setColor(Color.BLACK);
+                if (j < rectangle_distance_x.size()) // 防止 out of bound error
+                    g.fillRect(rectangle_Fill.x, rectangle_Fill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
+                j++;
             }
             //
         }
