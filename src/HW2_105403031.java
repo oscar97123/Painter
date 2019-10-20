@@ -680,6 +680,7 @@ public class HW2_105403031 extends JFrame{
                 //title 設為"選擇顏色"
                 //預設顏色 黑色
                 chosen_color = JColorChooser.showDialog(drawingPanel, "選擇顏色", Color.BLACK);
+                //
             }
         });
 
@@ -688,9 +689,11 @@ public class HW2_105403031 extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 System.out.println("點選 清除畫面");
 
+                // 清除所有的繪圖
                 drawingPanel.validate();
-                remove_all_arrayList_value();
+                remove_all_arrayList_value(); //function內實作 清除ArrayList 所有記錄
                 drawingPanel.repaint();
+                //
             }
         });
 
@@ -703,7 +706,7 @@ public class HW2_105403031 extends JFrame{
     }
 
     private void remove_all_arrayList_value() {
-        // 用ArrayList記錄 所有繪圖的點
+        // 清除ArrayList 所有記錄
         points_small_size.clear();
         points_medium_size.clear();
         points_big_size.clear();
@@ -729,6 +732,7 @@ public class HW2_105403031 extends JFrame{
         rectangles_Fill_big_size.clear();
         rectangle_distance_x.clear();
         rectangle_distance_y.clear();
+        //
     }
 
     private void fill_checkBox_OnClick(){
