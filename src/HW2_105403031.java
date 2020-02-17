@@ -1,9 +1,9 @@
-import javafx.scene.shape.Line;
-
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.awt.Point;
+import java.util.Collection;
 
 import javax.swing.*;
 
@@ -40,42 +40,67 @@ public class HW2_105403031 extends JFrame{
     private int end_point_x;
     private int end_point_y;
     private boolean fill_checked = false;
-    private Point start_point;
-    private Point end_point;
-    private Color chosen_color;
+    private Color chosen_color = Color.BLACK;
 
     // 用ArrayList記錄 所有繪圖的點
     private ArrayList<Point> points_small_size = new ArrayList<>();
     private ArrayList<Point> points_medium_size = new ArrayList<>();
     private ArrayList<Point> points_big_size = new ArrayList<>();
+    private ArrayList<Color> points_small_size_color = new ArrayList<>();
+    private ArrayList<Color> points_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> points_big_size_color = new ArrayList<>();
 
-    private ArrayList<Line> lines_small_size = new ArrayList<>();
-    private ArrayList<Line> lines_medium_size = new ArrayList<>();
-    private ArrayList<Line> lines_big_size = new ArrayList<>();
+    private ArrayList<Line2D> lines_small_size = new ArrayList<>();
+    private ArrayList<Line2D> lines_medium_size = new ArrayList<>();
+    private ArrayList<Line2D> lines_big_size = new ArrayList<>();
+    private ArrayList<Color> lines_small_size_color = new ArrayList<>();
+    private ArrayList<Color> lines_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> lines_big_size_color = new ArrayList<>();
 
-    private ArrayList<Line> dotted_lines_small_size = new ArrayList<>();
-    private ArrayList<Line> dotted_lines_medium_size = new ArrayList<>();
-    private ArrayList<Line> dotted_lines_big_size = new ArrayList<>();
+    private ArrayList<Line2D> dotted_lines_small_size = new ArrayList<>();
+    private ArrayList<Line2D> dotted_lines_medium_size = new ArrayList<>();
+    private ArrayList<Line2D> dotted_lines_big_size = new ArrayList<>();
+    private ArrayList<Color> dotted_lines_small_size_color = new ArrayList<>();
+    private ArrayList<Color> dotted_lines_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> dotted_lines_big_size_color = new ArrayList<>();
 
     private ArrayList<Point> circles_noFill_small_size = new ArrayList<>();
     private ArrayList<Point> circles_noFill_medium_size = new ArrayList<>();
     private ArrayList<Point> circles_noFill_big_size = new ArrayList<>();
+    private ArrayList<Color> circles_noFill_small_size_color = new ArrayList<>();
+    private ArrayList<Color> circles_noFill_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> circles_noFill_big_size_color = new ArrayList<>();
 
     private ArrayList<Point> circles_Fill_small_size = new ArrayList<>();
     private ArrayList<Point> circles_Fill_medium_size = new ArrayList<>();
     private ArrayList<Point> circles_Fill_big_size = new ArrayList<>();
     private ArrayList<Integer> circle_distance_x = new ArrayList<>();
     private ArrayList<Integer> circle_distance_y = new ArrayList<>();
+    private ArrayList<Color> circles_Fill_small_size_color = new ArrayList<>();
+    private ArrayList<Color> circles_Fill_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> circles_Fill_big_size_color = new ArrayList<>();
+
 
     private ArrayList<Point> rectangles_noFill_small_size = new ArrayList<>();
     private ArrayList<Point> rectangles_noFill_medium_size = new ArrayList<>();
     private ArrayList<Point> rectangles_noFill_big_size = new ArrayList<>();
+    private ArrayList<Color> rectangles_noFill_small_size_color = new ArrayList<>();
+    private ArrayList<Color> rectangles_noFill_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> rectangles_noFill_big_size_color = new ArrayList<>();
 
     private ArrayList<Point> rectangles_Fill_small_size = new ArrayList<>();
     private ArrayList<Point> rectangles_Fill_medium_size = new ArrayList<>();
     private ArrayList<Point> rectangles_Fill_big_size = new ArrayList<>();
     private ArrayList<Integer> rectangle_distance_x = new ArrayList<>();
     private ArrayList<Integer> rectangle_distance_y = new ArrayList<>();
+    private ArrayList<Color> rectangles_Fill_small_size_color = new ArrayList<>();
+    private ArrayList<Color> rectangles_Fill_medium_size_color = new ArrayList<>();
+    private ArrayList<Color> rectangles_Fill_big_size_color = new ArrayList<>();
+
+
+    private ArrayList<Point> eraser_arrayList = new ArrayList<>();
+    private boolean eraser_selected = false;
+    private int eraserClick_count = 0;
 
     public HW2_105403031() {
         super("小畫家");
@@ -85,7 +110,6 @@ public class HW2_105403031 extends JFrame{
 
         //建立繪圖範圍 + 背景顏色
         drawingPanel = new DrawingPanel();
-        //drawingPanel = new JPanel();
         drawingPanel.setBackground(Color.white);
         //
 
@@ -208,25 +232,35 @@ public class HW2_105403031 extends JFrame{
                 @Override
                 public void mouseDragged(MouseEvent e) {
 
-                    //判斷下拉選單選擇了那個繪圖工具
-                    if (current_mode.matches("筆刷")){
+                    if (!eraser_selected) {
+                        //判斷下拉選單選擇了那個繪圖工具
+                        if (current_mode.matches("筆刷")) {
 
-                        // 大 中 小size 筆刷的繪畫記錄(遊標位置) 會記錄在對應的arrayList
-                        if (size_selected.matches("small")) {
+                            // 大 中 小size 筆刷的繪畫記錄(遊標位置) 會記錄在對應的arrayList
+                            if (size_selected.matches("small")) {
 
-                            points_small_size.add(e.getPoint());
+                                points_small_size.add(e.getPoint());
+                                points_small_size_color.add(chosen_color);
 
-                        }else if (size_selected.matches("medium")){
+                            } else if (size_selected.matches("medium")) {
 
-                            points_medium_size.add(e.getPoint());
+                                points_medium_size.add(e.getPoint());
+                                points_medium_size_color.add(chosen_color);
 
-                        }else {
+                            } else {
 
-                            points_big_size.add(e.getPoint());
+                                points_big_size.add(e.getPoint());
+                                points_big_size_color.add(chosen_color);
 
+                            }
+                            //
                         }
-                        //
-//                        points_color.add(chosen_color); //記錄選擇的顏色
+                    }
+
+                    if(eraser_selected){ //橡皮擦mode
+
+                        eraser_arrayList.add(e.getPoint());
+
                     }
                     //
 
@@ -252,8 +286,6 @@ public class HW2_105403031 extends JFrame{
                     //當用戶按下左鍵時 記錄點擊的位置
                     start_point_x = e.getX();
                     start_point_y = e.getY();
-
-//                    start_point = e.getPoint();
                     //
                 }
 
@@ -263,144 +295,161 @@ public class HW2_105403031 extends JFrame{
                     //用戶放開左鍵時的位置
                     end_point_x = e.getX();
                     end_point_y = e.getY();
-
-//                    end_point = e.getPoint();
                     //
 
-                    //判斷下拉選單選擇了那個繪圖工具
-                    if(current_mode.matches("直線")){
+                    if (!eraser_selected) {
+                        //判斷下拉選單選擇了那個繪圖工具
+                        if (current_mode.matches("直線")) {
 
-                        if (fill_checked){
+                            if (fill_checked) {
 
-                            if (size_selected.matches("small")){ // 筆刷小size
-                                //記錄從那個點開始畫直線 到完結點
-                                lines_small_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
-                                //
-                            }else if (size_selected.matches("medium")){ // 筆刷中size
+                                if (size_selected.matches("small")) { // 筆刷小size
+                                    //記錄從那個點開始畫直線 到完結點
+                                    lines_small_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    lines_small_size_color.add(chosen_color);
+                                    //
+                                } else if (size_selected.matches("medium")) { // 筆刷中size
 
-                                lines_medium_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    lines_medium_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    lines_medium_size_color.add(chosen_color);
 
-                            }else { // 筆刷大size
+                                } else { // 筆刷大size
 
-                                lines_big_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    lines_big_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    lines_big_size_color.add(chosen_color);
+
+                                }
+
+                            } else {
+
+                                //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
+                                if (size_selected.matches("small")) {
+
+                                    dotted_lines_small_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    dotted_lines_small_size_color.add(chosen_color);
+
+                                } else if (size_selected.matches("medium")) {
+
+                                    dotted_lines_medium_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    dotted_lines_medium_size_color.add(chosen_color);
+
+                                } else {
+
+                                    dotted_lines_big_size.add(new Line2D.Float(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    dotted_lines_big_size_color.add(chosen_color);
+
+                                }
 
                             }
 
-                        }else {
+                        } else if (current_mode.matches("橢圓形")) {
 
-                            //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
-                            if (size_selected.matches("small")) {
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            circle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            circle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
 
-                                dotted_lines_small_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                            if (fill_checked) {
 
-                            }else if (size_selected.matches("medium")) {
+                                //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
+                                if (size_selected.matches("small")) {
 
-                                dotted_lines_medium_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
+                                    //再打包成一個"Point" 再記錄在arrayList 中
+                                    circles_Fill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_Fill_small_size_color.add(chosen_color);
+                                    //
 
-                            }else {
+                                } else if (size_selected.matches("medium")) {
 
-                                dotted_lines_big_size.add(new Line(start_point_x, start_point_y, end_point_x, end_point_y));
+                                    circles_Fill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_Fill_medium_size_color.add(chosen_color);
+
+                                } else {
+
+                                    circles_Fill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_Fill_big_size_color.add(chosen_color);
+
+                                }
+
+                            } else {
+
+                                //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
+                                if (size_selected.matches("small")) {
+
+                                    //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
+                                    //再打包成一個"Point" 再記錄在arrayList 中
+                                    circles_noFill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_noFill_small_size_color.add(chosen_color);
+                                    //
+
+                                } else if (size_selected.matches("medium")) {
+
+                                    circles_noFill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_noFill_medium_size_color.add(chosen_color);
+
+                                } else {
+
+                                    circles_noFill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    circles_noFill_big_size_color.add(chosen_color);
+
+                                }
+                            }
+
+                        } else if (current_mode.matches("矩形")) {
+
+                            //計算兩點距離 並取 絕對值(防止出現負數)
+                            rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
+                            rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
+                            //
+
+                            if (fill_checked) {
+
+                                //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
+                                if (size_selected.matches("small")) {
+
+                                    rectangles_Fill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_Fill_small_size_color.add(chosen_color);
+
+                                } else if (size_selected.matches("medium")) {
+
+                                    rectangles_Fill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_Fill_medium_size_color.add(chosen_color);
+
+                                } else {
+
+                                    rectangles_Fill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_Fill_big_size_color.add(chosen_color);
+
+                                }
+
+                            } else {
+
+                                //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
+                                if (size_selected.matches("small")) {
+
+                                    rectangles_noFill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_noFill_small_size_color.add(chosen_color);
+
+                                } else if (size_selected.matches("medium")) {
+
+                                    rectangles_noFill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_noFill_medium_size_color.add(chosen_color);
+
+                                } else {
+
+                                    rectangles_noFill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
+                                    rectangles_noFill_big_size_color.add(chosen_color);
+
+                                }
 
                             }
+
+                        } else {
 
                         }
-
-                    }else if (current_mode.matches("橢圓形")){
-
-                        //計算兩點距離 並取 絕對值(防止出現負數)
-                        circle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                        circle_distance_y.add(Math.abs(start_point_y - end_point_y));
                         //
-
-                        if (fill_checked){
-
-                            //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
-                            if (size_selected.matches("small")) {
-
-                                //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
-                                //再打包成一個"Point" 再記錄在arrayList 中
-                                circles_Fill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-                                //
-
-                            }else if (size_selected.matches("medium")) {
-
-                                circles_Fill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else {
-
-                                circles_Fill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }
-
-                            }else {
-
-                            //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
-                            if (size_selected.matches("small")) {
-
-                                //用min 找出x / y點的最小值 作為畫圖起點，使由下而上的畫圖能正常顯示
-                                //再打包成一個"Point" 再記錄在arrayList 中
-                                circles_noFill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-                                //
-
-                            }else if (size_selected.matches("medium")) {
-
-                                circles_noFill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else {
-
-                                circles_noFill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }
-                        }
-
-                    }else if (current_mode.matches("矩形")){
-
-                        //計算兩點距離 並取 絕對值(防止出現負數)
-                        rectangle_distance_x.add(Math.abs(start_point_x - end_point_x));
-                        rectangle_distance_y.add(Math.abs(start_point_y - end_point_y));
-                        //
-
-                        if (fill_checked){
-
-                            //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
-                            if (size_selected.matches("small")) {
-
-                                rectangles_Fill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else if (size_selected.matches("medium")){
-
-                                rectangles_Fill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else {
-
-                                rectangles_Fill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }
-
-                        }else {
-
-                            //與上面同理，判斷大 中 小 後 記錄在不同的arrayList
-                            if (size_selected.matches("small")) {
-
-                                rectangles_noFill_small_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else if (size_selected.matches("medium")) {
-
-                                rectangles_noFill_medium_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }else {
-
-                                rectangles_noFill_big_size.add(new Point(Math.min(start_point_x, end_point_x), Math.min(start_point_y, end_point_y)));
-
-                            }
-
-                        }
-
-                    }else {
-
                     }
-                    //
-
 
                     i = 0; // reset i = 0  因為會out of bound (每次畫都會把之前的重畫，所以設成0)  用於circle
                     j = 0; // 用於rectangle
@@ -424,85 +473,102 @@ public class HW2_105403031 extends JFrame{
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
+            int pt_s_Size = 0, pt_m_Size = 0, pt_l_Size = 0;
+            int lines_s_Size = 0, lines_m_Size = 0, lines_l_Size = 0;
+            int dotted_lines_s_Size = 0, dotted_lines_m_Size = 0, dotted_lines_l_Size = 0;
+            int circ_noFill_s_Size = 0, circ_noFill_m_Size = 0, circ_noFill_l_Size = 0;
+            int circ_Fill_s_Size = 0, circ_Fill_m_Size = 0, circ_Fill_l_Size = 0;
+            int rect_noFill_s_Size = 0, rect_noFill_m_Size = 0, rect_noFill_l_Size = 0;
+            int rect_Fill_s_Size = 0, rect_Fill_m_Size = 0, rect_Fill_l_Size = 0;
+
             // 記錄在arrayList 的遊標位置，用for loop 方法畫出來
             for (Point point : points_small_size) {
-                g.setColor(chosen_color);
+                g.setColor(points_small_size_color.get(pt_s_Size));
                 g.fillOval(point.x, point.y, 4, 4); //小size 筆刷的width, height 各為4
+                pt_s_Size++;
             }
 
             for (Point point : points_medium_size) {
-                g.setColor(chosen_color);
+                g.setColor(points_medium_size_color.get(pt_m_Size));
                 g.fillOval(point.x, point.y, 6, 6); //中size 筆刷的width, height 各為6
+                pt_m_Size++;
             }
 
             for (Point point : points_big_size) {
-                g.setColor(chosen_color);
+                g.setColor(points_big_size_color.get(pt_l_Size));
                 g.fillOval(point.x, point.y, 8, 8); //大size 筆刷的width, height 各為8
+                pt_l_Size++;
             }
 
-            for (Line line : lines_small_size) {
+            for (Line2D line : lines_small_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(lines_small_size_color.get(lines_s_Size));
                 g1.setStroke(new BasicStroke(1));
-                g1.drawLine((int)line.getStartX(), (int)line.getStartY(), (int)line.getEndX(), (int)line.getEndY());
+                g1.drawLine((int)line.getX1(), (int)line.getY1(), (int)line.getX2(), (int)line.getY2());
+                lines_s_Size++;
             }
 
-            for (Line line : lines_medium_size) {
+            for (Line2D line : lines_medium_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(lines_medium_size_color.get(lines_m_Size));
                 g1.setStroke(new BasicStroke(2));
-                g1.drawLine((int)line.getStartX(), (int)line.getStartY(), (int)line.getEndX(), (int)line.getEndY());
+                g1.drawLine((int)line.getX1(), (int)line.getY1(), (int)line.getX2(), (int)line.getY2());
+                lines_m_Size++;
             }
 
-            for (Line line : lines_big_size) {
+            for (Line2D line : lines_big_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(lines_big_size_color.get(lines_l_Size));
                 g1.setStroke(new BasicStroke(3));
-                g1.drawLine((int)line.getStartX(), (int)line.getStartY(), (int)line.getEndX(), (int)line.getEndY());
+                g1.drawLine((int)line.getX1(), (int)line.getY1(), (int)line.getX2(), (int)line.getY2());
+                lines_l_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
             }
 
-            for (Line dotted_line : dotted_lines_small_size) {
+            for (Line2D dotted_line : dotted_lines_small_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(dotted_lines_small_size_color.get(dotted_lines_s_Size));
                 //set the stroke of the copy, not the original
                 Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
                 g1.setStroke(dashed);
-                g1.drawLine((int)dotted_line.getStartX(), (int)dotted_line.getStartY(), (int)dotted_line.getEndX(), (int)dotted_line.getEndY());
+                g1.drawLine((int)dotted_line.getX1(), (int)dotted_line.getY1(), (int)dotted_line.getX2(), (int)dotted_line.getY2());
+                dotted_lines_s_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
             }
 
-            for (Line dotted_line : dotted_lines_medium_size) {
+            for (Line2D dotted_line : dotted_lines_medium_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(dotted_lines_medium_size_color.get(dotted_lines_m_Size));
                 //set the stroke of the copy, not the original
                 Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
                 g1.setStroke(dashed);
-                g1.drawLine((int)dotted_line.getStartX(), (int)dotted_line.getStartY(), (int)dotted_line.getEndX(), (int)dotted_line.getEndY());
+                g1.drawLine((int)dotted_line.getX1(), (int)dotted_line.getY1(), (int)dotted_line.getX2(), (int)dotted_line.getY2());
+                dotted_lines_m_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
             }
 
-            for (Line dotted_line : dotted_lines_big_size) {
+            for (Line2D dotted_line : dotted_lines_big_size) {
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(dotted_lines_big_size_color.get(dotted_lines_l_Size));
                 //set the stroke of the copy, not the original
                 Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
                 g1.setStroke(dashed);
-                g1.drawLine((int)dotted_line.getStartX(), (int)dotted_line.getStartY(), (int)dotted_line.getEndX(), (int)dotted_line.getEndY());
+                g1.drawLine((int)dotted_line.getX1(), (int)dotted_line.getY1(), (int)dotted_line.getX2(), (int)dotted_line.getY2());
+                dotted_lines_l_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -512,12 +578,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_noFill_small_size_color.get(circ_noFill_s_Size));
                 if (i < circle_distance_x.size()) { // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(1));
                     g1.drawOval(circle_noFIll.x, circle_noFIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_noFill_s_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -527,12 +594,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_noFill_medium_size_color.get(circ_noFill_m_Size));
                 if (i < circle_distance_x.size()) {// 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(2));
                     g1.drawOval(circle_noFIll.x, circle_noFIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_noFill_m_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -542,12 +610,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_noFill_big_size_color.get(circ_noFill_l_Size));
                 if (i < circle_distance_x.size()) {// 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(3));
                     g1.drawOval(circle_noFIll.x, circle_noFIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_noFill_l_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -557,12 +626,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_Fill_small_size_color.get(circ_Fill_s_Size));
                 if (i < circle_distance_x.size()) { // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(1));
                     g1.fillOval(circle_FIll.x, circle_FIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_Fill_s_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -572,12 +642,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_Fill_medium_size_color.get(circ_Fill_m_Size));
                 if (i < circle_distance_x.size()) { // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(2));
                     g1.fillOval(circle_FIll.x, circle_FIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_Fill_m_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -587,12 +658,13 @@ public class HW2_105403031 extends JFrame{
                 //creates a copy of the Graphics instance
                 Graphics2D g1 = (Graphics2D) g.create();
 
-                g1.setColor(chosen_color);
+                g1.setColor(circles_Fill_big_size_color.get(circ_Fill_l_Size));
                 if (i < circle_distance_x.size()) { // 防止 out of bound error   (circle_distance_x.size() & circle_distance_y.size() 是一樣的，所以擇一檢查就好)
                     g1.setStroke(new BasicStroke(3));
                     g1.fillOval(circle_FIll.x, circle_FIll.y, circle_distance_x.get(i), circle_distance_y.get(i)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 i++;
+                circ_Fill_l_Size++;
 
                 //gets rid of the copy
                 g1.dispose();
@@ -600,71 +672,84 @@ public class HW2_105403031 extends JFrame{
 
             for (Point rectangle_noFill : rectangles_noFill_small_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_noFill_small_size_color.get(rect_noFill_s_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(1));
                     g1.drawRect(rectangle_noFill.x, rectangle_noFill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_noFill_s_Size++;
 
                 g1.dispose();
             }
 
             for (Point rectangle_noFill : rectangles_noFill_medium_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_noFill_medium_size_color.get(rect_noFill_m_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(2));
                     g1.drawRect(rectangle_noFill.x, rectangle_noFill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_noFill_m_Size++;
 
                 g1.dispose();
             }
 
             for (Point rectangle_noFill : rectangles_noFill_big_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_noFill_big_size_color.get(rect_noFill_l_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(3));
                     g1.drawRect(rectangle_noFill.x, rectangle_noFill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_noFill_l_Size++;
 
                 g1.dispose();
             }
 
             for (Point rectangle_Fill : rectangles_Fill_small_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_Fill_small_size_color.get(rect_Fill_s_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(1));
                     g1.fillRect(rectangle_Fill.x, rectangle_Fill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_Fill_s_Size++;
                 g1.dispose();
             }
 
             for (Point rectangle_Fill : rectangles_Fill_medium_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_Fill_medium_size_color.get(rect_Fill_m_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(2));
                     g1.fillRect(rectangle_Fill.x, rectangle_Fill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_Fill_m_Size++;
                 g1.dispose();
             }
 
             for (Point rectangle_Fill : rectangles_Fill_big_size) {
                 Graphics2D g1 = (Graphics2D) g.create();
-                g1.setColor(chosen_color);
+                g1.setColor(rectangles_Fill_big_size_color.get(rect_Fill_l_Size));
                 if (j < rectangle_distance_x.size()) { // 防止 out of bound error
                     g1.setStroke(new BasicStroke(3));
                     g1.fillRect(rectangle_Fill.x, rectangle_Fill.y, rectangle_distance_x.get(j), rectangle_distance_y.get(j)); //前兩個參數: 開始繪圖的x y點； 後兩個參數：長＆闊
                 }
                 j++;
+                rect_Fill_l_Size++;
                 g1.dispose();
+            }
+
+            for (Point point : eraser_arrayList) {         //Eraser mode
+                Graphics2D g1 = (Graphics2D) g.create();
+                g1.setColor(Color.white);
+                g1.setStroke(new BasicStroke(7));
+                g1.drawLine(point.x, point.y, point.x, point.y);
             }
             //
         }
@@ -701,6 +786,19 @@ public class HW2_105403031 extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("點選 橡皮擦");
+
+                eraserClick_count++;
+
+                if (eraserClick_count % 2 == 0) {
+
+                    eraser_selected = false;
+
+                }else {
+
+                    eraser_selected = true;
+
+                }
+
             }
         });
     }
@@ -732,11 +830,12 @@ public class HW2_105403031 extends JFrame{
         rectangles_Fill_big_size.clear();
         rectangle_distance_x.clear();
         rectangle_distance_y.clear();
+        eraser_arrayList.clear();
         //
     }
 
     private void fill_checkBox_OnClick(){
-      fill_checkBox.addItemListener(new ItemListener() {
+        fill_checkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (fill_checkBox.isSelected()){
